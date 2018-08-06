@@ -1,0 +1,35 @@
+void CountSort(int *array, size_t size)
+{
+	//确定范围
+	int MaxData = array[0];
+	int MinData = array[0];
+	for (size_t i = 0; i < size; i++)
+	{
+		if (array[i] < MinData)
+			MinData = array[i];
+
+		if (array[i]>MaxData)
+			MaxData = array[i];
+	}
+	//辅助空间
+	size_t newSize = MaxData - MinData + 1;
+	int* temp = new int[newSize];
+	memset(temp, 0, sizeof(int)*newSize);
+
+	//统计每个数据出现的次数
+	for (size_t i = 0; i < size; i++)
+		temp[array[i] - MinData]++;
+
+	//回收
+	int index = 0;
+	for (size_t i = 0; i < newSize; i++)
+	{
+		while (temp[i] > 0)
+		{
+			array[index++] = i + MinData;
+			temp[i]--;
+		}
+	}
+	delete[] temp;
+
+}
