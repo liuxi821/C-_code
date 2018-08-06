@@ -1,4 +1,4 @@
-int GetMidIdx(int *array, int left, int right);
+#include "h.hpp"
 size_t Pation1(int* array, int left, int right)
 {
 	//cout << "第一种：";
@@ -34,26 +34,5 @@ void QuickSort1(int* arr, int left, int right)
 		size_t div = Pation1(arr, left, right);
 		QuickSort1(arr, left, div);
 		QuickSort1(arr, div + 1, right);
-	}
-}
-int GetMidIdx(int *array, int left, int right)
-{
-	int mid = left + ((right - left) >> 1);
-	if (array[left] < array[right - 1])
-	{
-		if (array[left]>array[mid])
-			return left;
-		else if (array[right - 1] < array[mid])
-			return right - 1;
-		return mid;
-	}
-	else /*if (array[left]>array[right - 1])*/
-	{
-		if (array[mid] > array[left])
-			return left;
-		else if (array[mid] < array[right - 1])
-			return right - 1;
-		else
-			return mid;
 	}
 }
