@@ -1,0 +1,39 @@
+#include "h.hpp"
+//挖坑法
+size_t Pation2(int* array, int left, int right)
+{
+	int begin = 0;
+	int end = right - 1;
+	int index = GetMidIdx(array, left, right);
+	if (array[index] != array[end])
+		swap(array[index], array[end]);
+	int key = array[end];
+	while (begin < end)
+	{
+		while (begin < end && array[begin] < key)
+			begin++;
+		if (begin < end)
+			array[end--] = array[begin];
+
+		while (begin < end && array[end] > key)
+			end--;
+		if (begin < end)
+			array[begin++] = array[end];
+	}
+	array[begin] = key;
+	return begin;
+}
+
+void QuickSort2(int* arr, int left, int right)
+{
+	//if (right - left < 16) --- 数据少于16时，插入排序效率比较高
+	//	InsertSort(arr, right - left);
+	//else
+	if (left < right)
+	{
+		size_t div = Pation2(arr, left, right);
+		//size_t div = Pation3(arr, left, right);
+		QuickSort2(arr, left, div);
+		QuickSort2(arr, div + 1, right);
+	}
+}
