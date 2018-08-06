@@ -1,0 +1,38 @@
+void Merge(int *array, int left, int mid, int right, int *temp)
+{
+	int index1 = left;
+	int index2 = mid;
+	int index = left;
+
+	while (index1 < mid&&index2 < right)
+	{
+		if (array[index1] < array[index2])
+			temp[index++] = array[index1++];
+		else
+			temp[index++] = array[index2++];
+	}
+	while (index1 < mid)
+		temp[index++] = array[index1++];
+	while (index2 < right)
+		temp[index++] = array[index2++];
+	memcpy(array + left, temp + left, (right - left)*sizeof(array[0]));
+}
+
+void _Mergesort(int *array, int left, int right, int *temp)
+{
+	if (right - left <= 1)
+		return;
+	if (left < right)
+	{
+		int mid = left + ((right - left) >> 1);
+		_Mergesort(array, left, mid, temp);
+		_Mergesort(array, mid , right, temp);
+		Merge(array, left, mid, right, temp);
+	}
+}
+void Mergesort(int *array,int size)
+{
+	int *temp = new int[size];
+	_Mergesort(array, 0, size, temp);
+	delete[] temp;
+}
