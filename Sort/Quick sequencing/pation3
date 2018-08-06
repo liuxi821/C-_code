@@ -1,0 +1,35 @@
+//两个指针在同一边，一前一后
+int Pation3(int* array, int left, int right)
+{
+	//cout << "第三种：";
+	//int key = array[right - 1];
+	int key = GetMidData(array, left, right);
+	int cur = 0;
+	int pre = cur - 1;
+
+	while (cur < right)
+	{
+		//如果cur和 pre是一前一后，则不用交换
+		if (array[cur] < key && ++pre != cur)
+		{
+			swap(array[pre], array[cur]);
+		}
+		cur++;
+	}
+	if (++pre != right)
+		swap(array[pre], array[right - 1]);
+	return pre;
+}
+
+void QuickSort3(int* arr, int left, int right)
+{
+	//if (right - left < 16) --- 数据少于16时，插入排序效率比较高
+	//	InsertSort(arr, right - left);
+	//else
+	if (left < right)
+	{
+		size_t div = Pation3(arr, left, right);
+		QuickSort3(arr, left, div);
+		QuickSort3(arr, div + 1, right);
+	}
+}
