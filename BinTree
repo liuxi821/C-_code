@@ -1,0 +1,428 @@
+#include<iostream>
+#include<assert.h>
+#include<queue>
+#include<stack>
+using namespace std;
+
+template<class T>
+struct BinTreeNode
+{
+	BinTreeNode(const T& data)
+	:_Left(NULL)
+	, _Right(NULL)
+	, _data(data)
+	{}
+	BinTreeNode<T>*  _Left;
+	BinTreeNode<T>* _Right;
+	T _data;
+};
+
+template<class T>
+class BinTree
+{
+	typedef BinTreeNode<T> Node;
+	typedef BinTreeNode<T>* pNode;
+public:
+	BinTree()
+		:_pRoot(NULL)
+	{}
+	BinTree(T* array, size_t size,const T& invalid)
+	{
+		size_t index=0;
+		_GreateBinTree(_pRoot, array, size, index, invalid);
+	}
+	BinTree(const BinTree& b)
+	{
+		_pRoot = _CopyBinTree(b._pRoot);
+	}
+	BinTree& operator=(const BinTree& b)
+	{
+		if (this != &b)
+		{
+			if (_pRoot)
+				_DestroyBinTree(_pRoot);
+			_pRoot = _CopyBinTree(b._pRoot);
+		}
+		return *this;
+	}
+	~BinTree()
+	{
+		_DestroyBinTree(_pRoot);
+	}
+	void PreOrder()
+	{
+		_PreOrder(_pRoot);
+		cout << endl;
+	}
+	void PreOrder_Nor1()
+	{
+		
+		_PreOrder_Nor1(_pRoot);
+		cout << endl;
+	}
+	void PreOrder_Nor2()
+	{
+		_PreOrder_Nor2(_pRoot);
+		cout << endl;
+	}
+	void InOrder()
+	{
+		_InOrder(_pRoot);
+		cout << endl;
+	}
+	/*void InOrder_Nor()
+	{
+		_InOrder_Nor(_pRoot);
+		cout << endl;
+	}*/
+	void PostOrder()
+	{
+		_PostOrder(_pRoot);
+		cout << endl;
+	}
+	void PostOrder_Nor()
+	{
+		_PostOrder_Nor(_pRoot);
+		cout << endl;
+	}
+	void LevelOrder()
+	{
+		_LevelOrder(_pRoot);
+		cout << endl;
+	}
+	size_t Size()
+	{
+		return _Size(_pRoot);
+	}
+	size_t GetLeefCount()
+	{
+		if (_pRoot == 0)
+			return 0;
+		return _GetLeefCount(_pRoot);
+	}
+	// 获取第K层结点的个数 
+	/*size_t GetKLevelCount(size_t K)
+	{
+		
+		_GetKLeefCount
+	}*/
+	size_t Height()
+	{
+		_Height(_pRoot);
+	}
+	pNode Find(const T& data)
+	{
+		pNode pCur = _Find(_pRoot, data);
+		return pCur;
+	}
+	pNode Parent(pNode pNode)
+	{
+		_Parent(_pRoot, pNode);
+	}
+	
+	pNode LeftChild(pNode pNode)
+	{
+		if (pNode == NULL)
+			return NULL;
+		return pNode->_Left;
+	}
+	pNode RightChild(pNode pNode)
+	{
+		if (pNode == NULL)
+			return NULL;
+		return pNode->_Right;
+	}
+private:
+	void _GreateBinTree(BinTreeNode<T>*& pRoot, T* array, size_t size, size_t& index,const T& invalid)
+	{
+		if (index < size && invalid != array[index])
+		{
+			pRoot = new BinTreeNode<T>(array[index]);
+			_GreateBinTree(pRoot->_Left, array, size, ++index, invalid);
+			_GreateBinTree(pRoot->_Right, array, size, ++index, invalid);
+		}
+	}
+
+	void _DestroyBinTree(pNode& pRoot)
+	{
+		if (pRoot)
+		{
+			_DestroyBinTree(pRoot->_Left);
+			_DestroyBinTree(pRoot->_Right);
+			delete pRoot;
+			pRoot = NULL;
+		}
+	}
+	pNode _CopyBinTree(pNode pRoot)
+	{
+		pNode pNewRoot = NULL;
+		if (pRoot)
+		{
+			pNewRoot = new Node(pRoot->data);
+			if (pRoot->_Left)
+				pNewRoot->_Left = _CopyBinTree(pRoot->_Left);
+			if (pRoot->_Right)
+				pNewRoot->_Right = _CopyBinTree(pRoot->_Right);
+		}
+		return pNewRoot;
+	}
+	
+	// 根--->根的左子树---->根的右子树 
+	void _PreOrder(pNode& pRoot)
+	{
+		if (pRoot)
+		{
+			cout << pRoot->_data << " ";
+			_PreOrder(pRoot->_Left);
+			_PreOrder(pRoot->_Right);
+		}
+	}
+	void _PreOrder_Nor1(pNode& pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		stack<pNode> s;
+		s.push(pRoot);
+		pNode pCur = pRoot;
+		while (!s.empty())
+		{
+			pCur = s.top ();
+			cout << pCur->_data << " ";
+			s.pop();
+			if (pCur->_Right)
+				s.push(pCur->_Right);
+			if (pCur->_Left)
+				s.push(pCur->_Left);
+		}
+	}
+	void _PreOrder_Nor2(pNode& pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		stack<pNode> s;
+		s.push(pRoot);
+		pNode pCur = pRoot;
+		while (!s.empty())
+		{
+			pCur = s.top();
+			s.pop();
+			while (pCur)
+			{
+				if (pCur->_Right)
+					s.push(pCur->_Right);
+				cout << pCur->_data << " ";
+				pCur = pCur->_Left;
+			}
+		}
+	}
+
+
+	// 左子树--->根节点--->右子树 
+	void _InOrder(pNode pRoot)
+	{
+		if (pRoot)
+		{
+			_InOrder(pRoot->_Left);
+			cout << pRoot->_data << " ";
+			_InOrder(pRoot->_Right);
+		}
+	}
+	void _InOrder_Nor1(pNode pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		stack<pNode> s1;
+		pNode pCur = pRoot;
+		while (pCur || !s1.empty())
+		{
+			while(pCur)
+			{
+				s1.push(pCur);
+				pCur = pCur->_Left;
+			}
+			pCur = s1.top();
+			cout << pCur->_data << " ";
+			s1.pop();
+			
+			pCur = pCur->_Right;		
+		}
+	}
+	//void _InOrder_Nor(pNode pRoot)
+	//{
+	//	stack<pNode> s;
+	//	pNode pCur = pRoot;
+	//	while (!s.empty())
+	//	{
+	//		while (pCur)
+	//		{
+	//			s.push(pCur);
+	//			pCur = pCur->_Left;
+	//		}
+	//		pCur = s.top();
+	//		cout << pCur->_data;
+	//		s.pop();
+	//		while (NULL == pCur->_Right)
+	//		{
+	//			pCur = s.top();
+	//			cout << pCur->_data;
+	//			s.pop();
+	//		}
+	//	}
+	//}
+
+
+	// 左子树--->右子树--->根节点 
+	void _PostOrder(pNode pRoot)
+	{
+		if (pRoot)
+		{
+			_PostOrder(pRoot->_Left);
+			_PostOrder(pRoot->_Right);
+			cout << pRoot->_data << " ";
+		}
+	}
+	/*void _PostOrder_Nor(pNode pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+
+		stack<pNode> s2;
+		pNode pCur = pRoot;
+		pNode prev = NULL;
+
+		pNode pTop = pRoot;
+		while (pCur || !s2.empty())
+		{
+			while (pCur && pCur != prev)
+			{
+				s2.push(pCur);
+				pCur = pCur->_Left;
+			}
+			pCur = s2.top();
+
+			if (NULL == pCur->_Right)
+			{
+				cout << pCur->_data << " ";
+				prev = pCur;
+				s2.pop();
+			}
+			else
+			{
+				pCur = pCur->_Right;
+			}
+		}
+	}*/
+	void _LevelOrder(pNode pRoot)
+	{
+		queue<pNode> q;
+		q.push(pRoot);
+		pNode pCur = NULL;
+		while (!q.empty())
+		{
+			pCur = q.front();
+			cout << pCur->_data << " ";
+			q.pop();
+			if (pCur->_Left)
+			{
+				q.push(pCur->_Left);
+			}
+			if (pCur->_Right)
+			{
+				q.push(pCur->_Right);
+			}
+		}
+		cout << endl;
+	}
+	size_t _Size(pNode pRoot)
+	{
+		if (pRoot == 0)
+			return 0;
+		return _Size(pRoot->_Left) + _Size(pRoot->_Right) + 1;
+	}
+	size_t _GetLeefCount(pNode pRoot)
+	{
+		if (pRoot == 0)
+			return 0;
+		if (pRoot->_Left == NULL && pRoot->_Right == NULL)
+			return 1;
+		return _GetLeefCount(pRoot->_Left) + _GetLeefCount(pRoot->_Right);
+	}
+	size_t _Height(pNode pRoot)
+	{
+		if (pRoot == 0)
+			return 0;
+		if (pRoot->_Left == NULL && pRoot->_Right == NULL)
+			return 1;
+		return _Height(pRoot->_Left) > _Height(pRoot->_Right) ?
+			(_Height(pRoot->_Left) + 1) : (_Height(pRoot->_Right) + 1);
+	}
+	pNode _Find(pNode pRoot, const T& data)
+	{
+		if (pRoot == NULL)
+			return NULL;
+		if (pRoot->_data == data)
+			return pRoot;
+
+		pNode pCur = NULL;
+		pCur = _Find(pRoot->_Left, data);
+		if (pCur)
+			return pCur;
+
+		return  _Find(pRoot->_Right, data);
+	}
+	pNode _Parent(pNode pRoot, pNode pNode)
+	{
+		pNode pCur = NULL;
+		if (pRoot == NULL || pNode == NULL || pNode == pRoot)
+			return NULL;
+		if (pRoot->_Left == pNode || pRoot->_Right == pNode)
+			return pRoot;
+		pCur = _Parent(pRoot->_Left, pNode);
+		if (pCur)
+			return pCur;
+		return _Parent(pRoot->_Right,pNode);
+
+		/*if (pRoot->_Left)
+		_Parent(pRoot->_Left, pNode);
+		if (pRoot->_Right)
+		_Parent(pRoot->_Right, pNode);*/
+	}
+private:
+	BinTreeNode<T>* _pRoot;
+};
+
+void Test1()
+{
+	char array[] = "ABD###CE##F";
+	BinTree<char> b1(array, strlen(array), '#');
+	b1.PreOrder();
+	b1.PreOrder_Nor1();
+	b1.PreOrder_Nor2();
+	b1.InOrder();
+	//b1.InOrder_Nor();
+	b1.PostOrder();
+	//b1.PostOrder_Nor();
+	b1.LevelOrder();
+}
+void Test2()
+{
+	char array[] = "ABD###CE##F";
+	BinTree<char> b1(array, strlen(array), '#');
+	BinTreeNode<char>* temp = b1.Find('B');
+	cout << temp->_data << endl;
+
+	b1.Height();
+	cout << b1.Size() << endl;
+	cout << b1.GetLeefCount() << endl;
+	cout << b1.Parent(temp) << endl;
+	cout << b1.Find('C') << endl;
+}
+
+int main()
+{
+	//Test1();
+	Test2();
+
+	getchar();
+	return 0;
+}
