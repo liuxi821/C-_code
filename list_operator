@@ -1,0 +1,364 @@
+#ifndef __LINKLIST_H__ 
+#define __LINKLIST_H__ 
+
+#include <stdio.h>
+#include <stdlib.h>  
+#include <string.h>  
+#include <assert.h>  
+
+typedef int DataType;
+
+typedef struct Node
+{
+	DataType data;
+	struct Node* next;
+}Node, *pNode, *pList;
+
+void InitLinkList(pList* pplist)
+{
+	assert(pplist != NULL);
+	*pplist = NULL;
+}
+void PushFront(pList* pplist, DataType d)
+{
+	assert(pplist != NULL);
+	pNode node = (pNode)malloc(sizeof(pNode));
+	if (node == NULL)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+	node->data = d;
+	node->next = NULL;
+	node->next = *pplist;
+	*pplist = node;
+}
+void Display(pList pl)
+{
+	if (pl == NULL)
+	{
+		//printf("NULL");
+		return;
+	}
+	while (pl != NULL)
+	{
+		printf("%d->", pl->data);
+		pl = pl->next;
+	}
+	printf("%d\n");
+}
+void Show(pList pl)
+{
+	if (pl == 0)
+	{
+		return;
+	}
+	else if (pl != NULL)
+	{
+		Show(pl->next);
+		printf("%d -> ", pl->data);
+	}
+	printf("%d\n");
+}
+void DestroyList(pList* pplist)//销毁
+{
+	assert(pplist != NULL);
+	while (*pplist != NULL)
+	{
+		pNode tmp = (*pplist)->next;
+		free(*pplist);
+		(*pplist)->next = NULL;
+		*pplist = tmp;
+	}
+}
+void DelNotTail(pNode pos)//删除无头链表的非尾节点
+{
+	assert(pos != NULL);
+	pNode N = NULL;
+	N->data = pos->data;
+	pos->data = pos->next->data;
+	pos->next = pos->next->next;
+	free(N);
+	free(pos->next);
+}
+pNode Find(pList pl, DataType d)
+{
+	pNode p = pl;
+	while (p->data != d)
+	{
+		p = p->next;
+	}
+	if (p->data == d)
+	{
+		return p;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+//在任意位置前插入一个节点
+void InsertFrontNode(pNode pos, DataType d)
+{
+	pNode temp = (pNode)malloc(sizeof(Node));
+	if (pos == NULL)
+		return;
+	if (temp == NULL)
+	{
+		perror("malloc");
+		return;
+	}
+	//在该节点后面增加一个节点，交换两个节点数据，就相当于在该节点前面开辟一个节点一样
+	temp->next = pos->next;
+	pos->next = temp;
+	temp->data = pos->data;
+	pos->data = d;
+}
+//约瑟夫环
+void JosephCycle(pList pl, int k)
+{
+	pNode temp = NULL;
+	pNode head = pl;
+	int count = k;
+	if (plist == NULL)
+		return;
+	//删除后面节点法
+	while (head != head->next)
+	{
+		count = k;
+		while (count - 1 > 0)
+		{
+			head = head->next;
+			count--;
+		}
+		printf("%d ", head->data);
+		temp = head->next;
+		head->data = head->next->data;
+		head->next = head->next->next;
+		free(temp);
+}
+void ReverseList(pList* pplist);
+
+//对链表的冒泡排序
+void BubbleSortList(pList plist)
+{
+	pNode cur1 = plist;
+	pNode cur2 = NULL;
+	//每次循环的标记
+	pNode flag = NULL;
+	Datatype Datmp = 0;
+	if (plist == NULL || plist->next == NULL)
+		return;
+	while (cur1->next != flag)
+	{
+
+		while (cur1->next != flag)
+		{
+			if (cur1->data < cur1->next->data)
+			{
+				Datmp = cur1->data;
+				cur1->data = cur1->next->data;
+				cur1->next->data = Datmp;
+			}
+			cur1 = cur1->next;
+		}
+		flag = cur1;
+		cur1 = plist;
+	}
+}
+//链表的合并
+pList Merge(pList* ppl1, pList* ppl2)
+{
+	assert(ppl1&&ppl2);
+	pList New_list = NULL;
+	pNode cur1 = *ppl1;
+	pNode cur2 = *ppl2;
+	pNode temp = NULL;
+	pNode head = NULL;
+	pNode tail = NULL;
+	if (*ppl1 == NULL&&*ppl2 == NULL)
+		return NULL;
+	if (*ppl1 == *ppl2)
+		return*ppl1;
+	if (*ppl1 == NULL)
+		return *ppl2;
+	if (*ppl2 == NULL)
+		return *ppl1;
+	if (cur1->data < cur2->data)
+	{
+		head = cur2;
+		cur2 = cur2->next;
+	}
+	else
+	{
+		head = cur1;
+		cur1 = cur1->next;
+	}
+	tail = head;
+	tail->next = NULL;
+	while (cur1 != NULL&&cur2 != NULL)
+	{
+		if (cur1->data < cur2->data)
+		{
+			tail->next = cur2;
+			cur2 = cur2->next;
+		}
+		else
+		{
+			tail->next = cur1;
+			cur1 = cur1->next;
+		}
+		tail = tail->next;
+		tail->next = NULL;
+	}
+	if (cur1 == NULL)
+		tail->next = cur2;
+	else
+		tail->next = cur1;
+	New_list = head;
+	return New_list;
+}
+
+//寻找一个链表的中间节点，只能遍历一次
+pNode FindMidNode(pList plist)
+{
+	pNode fast = plist;
+	pNode slow = plist;
+	if (fast == NULL)
+		return NULL;
+	while (fast != NULL&&fast->next != NULL)
+	{
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+	return slow;
+}
+
+void Test1()
+{
+	pList p1;
+	InitLinkList(&p1);
+	PushFront(&p1, 3);
+	Display(p1);
+	PushFront(&p1, 2);
+	Display(p1);
+	PushFront(&p1, 1);
+	Display(p1);
+
+	PushFront(&p1, 0);
+	Display(p1);
+}
+void Test2()
+{
+	pList pl1 = NULL;
+	pList pl2 = NULL;
+	pList New_list = NULL;
+	//第一链表list1
+	InitLinkList(&pl1);
+	PushFront(&p11, 7);
+	PushFront(&p11, 3);
+	PushFront(&p11, 1);
+	PushFront(&p11, 0);
+	Display(p11);
+
+	//第二条链表
+	InitLinkList(&p1);
+	PushFront(&p12, 6);
+	PushFront(&pl2, 5);
+	PushFront(&p12, 4);
+	PushFront(&p12, 2);
+	Display(p12);
+
+	New_list = Merge(&list1, &list2);
+	Display(New_list);
+
+	DestroyList(&pl1);
+	DestroyList(&pl2);
+}
+//删除一个非尾节点
+void Test3()
+{
+	InitLinkList(&pl1);
+	PushFront(&p11, 7);
+	PushFront(&p11, 3);
+	PushFront(&p11, 1);
+	PushFront(&p11, 0);
+	Display(pl1);
+
+	DelNotTail(Find(pl1, 3));
+	Display(pl1);
+
+	DestroyList(&pl1);
+}
+//指定节点前面添加一个节点
+void Test4()
+{
+	pList list = NULL;
+	PushFront(&list, 1);
+	PushFront(&list, 2);
+	PushFront(&list, 3);
+	PushFront(&list, 4);
+	Display(list);
+
+	InsertFrontNode(Find(list, 3), 5);
+	Display(list);
+	DestroyList(&list);
+}
+//约瑟夫环
+void Test5()
+{
+	pList list = NULL;
+	PushFront(&list, 1);
+	PushFront(&list, 2);
+	PushFront(&list, 3);
+	PushFront(&list, 4);
+	PushFront(&list, 5);
+	Display(list);
+	Find(list, 1)->next = list;
+	JosephCycle(list, 3);
+}
+//寻找一个链表的中间节点，只能遍历一次
+void Test6()
+{
+	pList list = NULL;
+	PushFront(&list, 1);
+	PushFront(&list, 2);
+	PushFront(&list, 3);
+	PushFront(&list, 4);
+	PushFront(&list, 5);
+	PushFront(&list, 6);
+	printf("%d\n", FindMidNode(list)->data);
+	DestroyList(&list);
+}
+//对链表的冒泡排序
+void Test7()
+{
+	pList list = NULL;
+	PushFront(&list, 1);
+	PushFront(&list, 3);
+	PushFront(&list, 5);
+	PushFront(&list, 2);
+	PushFront(&list, 4);
+	PushFront(&list, 6);
+	PushFront(&list, 2);
+	PushFront(&list, 5);
+	PushFront(&list, 7);
+	BubbleSortList(list);
+	Display(list);
+	DestroyList(&list);
+}
+
+int main()
+{
+	Test1();
+	Test2();
+	Test3();
+	Test4();
+	Test5();
+	Test6();
+	Test7();
+
+	getchar();
+	return 0;
+}
+#endif
