@@ -1,0 +1,86 @@
+//************************************************YYY
+//旋转单链表  0->1->2  4 (Y)
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x) 
+		:val(x)
+		, next(NULL) 
+	{}
+};
+class Solution {
+public:
+	//ListNode* moveRight(ListNode*& phead)
+	void moveRight(ListNode*& phead)
+	{
+		ListNode* pNext = phead;
+		ListNode* pCur = NULL;
+		ListNode* pPre = NULL;
+		while (pNext)
+		{
+			pPre = pCur;
+			pCur = pNext;
+			pNext = pNext->next;
+		}
+		if (pPre == NULL)
+			return;
+			//return phead;
+		pPre->next = NULL;
+		pCur->next = phead;
+		phead = pCur;
+		//return pCur;
+
+	}
+	ListNode *rotateRight(ListNode*& head, int k)
+	{
+		if (head == NULL)
+			return NULL;
+		int size = len(head);
+		k = k%size;
+		while (k--)
+		{
+			moveRight(head);
+			//head = moveRight(head);
+		}
+		return head;
+	}
+	int len(ListNode* phead)
+	{
+		ListNode* p = phead;
+		int size = 0;
+		while (p)
+		{
+			size++;
+			p = p->next;
+		}
+		return size;
+	}
+	void Push(ListNode*& pHead, int d)
+	{
+		ListNode* Node = new ListNode(d);
+		if (pHead == NULL)
+		{
+			pHead = Node;
+			return;
+		}
+			
+		ListNode* pCur = pHead;
+		ListNode* pNext = pCur->next;
+		while (pNext)
+		{
+			pCur = pCur->next;
+			pNext = pNext->next;
+		}
+		pCur->next = Node;
+	}
+	void show(ListNode* pHead)
+	{
+		ListNode* pCur = pHead;
+		while (pCur)
+		{
+			cout << pCur->val << " -> ";
+			pCur = pCur->next;
+		}
+		cout << "NULL;" << endl;
+	}
+};
