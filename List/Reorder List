@@ -1,0 +1,142 @@
+Given a singly linked list L: L0->L1->...->Ln-1->Ln,
+reorder it to: L0->Ln->L1->Ln-1->L2->Ln-2->...
+
+//**********************************************************
+//一个链表长N，前N/2个节点作为链表1，L1->L2->L3->L4->...
+//后面的作为链表2，R1->R2->R3->R4->...
+//合并后：L1->R1->L2->R2->L3->R3->L4->R4->...
+
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x)
+		:val(x)
+		, next(NULL)
+	{}
+};
+
+class Solution {
+public:
+	/**
+	*	按照左右半区的方式重新组合单链表
+	*	输入：一个单链表的头节点head
+	*	将链表调整成题目要求的样子
+	*
+	*	后台的单链表节点类如下：
+	*/
+  
+
+/*void Push(ListNode*& Head, int d)
+	{
+		ListNode* newNode = (ListNode*)malloc(sizeof(ListNode));
+		newNode->val = d;
+		newNode->next = NULL;
+		if (Head == NULL)
+		{
+			Head = newNode;
+			return;
+		}
+		ListNode* pCur = Head;
+		while (pCur->next)
+			pCur = pCur->next;
+		pCur->next = newNode;
+	}
+*/
+	void relocateList(struct ListNode* head) {
+		if (head == NULL || head->next == NULL || head->next->next == NULL || head->next->next->next == NULL)
+			return;
+		int count = 0;
+		struct ListNode*cur = head;
+		//记录结点的个数
+		while (cur)
+		{
+			++count;
+			cur = cur->next;
+		}
+		int front = (count >> 1);
+
+		struct ListNode*last = head;//标记后半区的开始结点
+		//while (--front)
+		while (front--)
+		{
+			last = last->next;
+		}
+
+		cur = head;
+		struct ListNode*curNode = head;//用来标记右半区中的链表
+		struct ListNode*lastNode = last;//用来标记左半区中的链表
+		struct ListNode*flag = last;
+		//while (cur != flag&&last->next != NULL)
+		while (cur != flag)
+		{
+			//if (cur != flag)
+			//{
+			curNode = curNode->next;
+			cur->next = last;
+			cur = curNode;
+			//}
+			if (cur == flag)
+			{
+				return;
+			}
+
+			lastNode = lastNode->next;
+			last->next = curNode;
+			last = lastNode;
+		}
+	}
+
+	void _relocateList(struct ListNode* head) {
+		int size = 0;
+		ListNode* pCur = head;
+		ListNode* newhead = head;
+		while (pCur)
+		{
+			size++;
+			pCur = pCur->next;
+		}
+		pCur = head;
+		int mid = size / 2;
+		//找到中间点作为新的头
+		while (mid--)
+		{
+			pCur = pCur->next;
+			newhead = newhead->next;
+		}
+		pCur = head;
+		while (pCur->next != newhead)
+		{
+			pCur = pCur->next;
+		}
+		pCur->next = NULL;
+
+		pCur = head;
+		ListNode* pPre1 = head->next;
+		ListNode* pPre2 = newhead->next;
+		while (pCur)
+		{
+			if (pPre1)
+				newhead->next = pCur->next;
+			pCur->next = newhead;
+			//newhead = newhead->next;
+			pCur = pPre1;
+			newhead = pPre2;
+			if (pPre1 == NULL)
+				return;
+			pPre1 = pPre1->next;
+
+			pPre2 = pPre2->next;
+		}
+	}
+/*
+	void display(ListNode* head)
+	{
+		while (head)
+		{
+			cout << head->val << "->";
+			head = head->next;
+		}
+		cout << "NULL" << endl;
+	}
+};
+*/
