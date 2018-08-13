@@ -1,0 +1,147 @@
+//层序打印二叉树，
+用一个vector<vector<int>>来保存每一行的值
+
+     1            v->1
+    / \  
+   2   3          v->2 3
+  / \ / \
+ 4  5 6  7        v->4 5 6 7
+ 
+ 打印结果 
+ 1
+ 2 3
+ 4 5 6 7
+ 
+ 
+ //思路:
+ 用两个队列q1,q2来存储每一行的节点
+q1是根的节点
+q2存根的左右子树的根的节点
+这就代表了两行，依次交换存入
+
+
+struct TreeNode {
+     int val;
+     struct TreeNode *left;
+     struct TreeNode *right;
+     TreeNode(int x) 
+		    :val(x)
+		    , left(NULL)
+		    , right(NULL) 
+	   {}
+};
+
+class Solution {
+public:
+	vector<vector<int>> Print(TreeNode* pRoot)
+	{
+		queue<TreeNode*> q1;
+		queue<TreeNode*> q2;
+		
+		vector<vector<int>> v;
+		
+		if (pRoot == NULL)
+			return v;
+		q1.push(pRoot);
+		TreeNode* pCur = pRoot;
+		int i = 0;
+		vector<int> vi;
+		while (!q1.empty() || !q2.empty())
+		{
+			vi.clear();
+			while (!q1.empty())
+			{
+				vi.push_back(q1.front()->val);
+				if (q1.front()->left)
+					q2.push(q1.front()->left);
+				if (q1.front()->right)
+					q2.push(q1.front()->right);
+				q1.pop();
+				
+			}
+			v.push_back(vi);
+
+			vi.clear();
+			while (!q2.empty())
+			{
+				vi.push_back(q2.front()->val);
+				if (q2.front()->left)
+					q1.push(q2.front()->left);
+				if (q2.front()->right)
+					q1.push(q2.front()->right);
+				q2.pop();
+			}
+			if (!vi.empty())
+				v.push_back(vi);
+		}
+		return v;
+	}
+  打印vector<vector<int>> 的值
+	void show(vector<vector<int>> v)
+	{
+		for (int i = 0; i < v.size(); i++)
+		{
+			for (int j = 0; j < v[i].size(); j++)
+				cout << v[i][j] << " ";
+			cout << endl;
+		}
+	}
+	
+  //创建二叉树
+	void preCreate(TreeNode* &T)
+	{
+		int array[] = { 1, 2, 4, 0, 0, 0, 3, 7, 0, 0, 8, 0, 0 };
+		int index = 0;
+		_preCreate(T, array, index);
+	}
+	void _preCreate(TreeNode* &T,int *array,int& index)
+	{
+		int num = array[index++];
+		//cin >> num;
+		if (num == 0) 
+			T = NULL;
+		else
+		{
+			T = new TreeNode(num);
+			_preCreate(T->left, array, index);
+			_preCreate(T->right, array, index);
+		}
+	}
+
+//前序遍历
+	void preOrder(TreeNode* T)
+	{
+		if (T == NULL) return;
+		else
+		{
+			cout << T->val << "  ";
+			preOrder(T->left);
+			preOrder(T->right);
+		}
+	}
+};
+
+void Test()
+{
+	vector<vector<int>> V;
+	vector<int> v;
+	v.push_back(0);
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	v.push_back(4);
+
+	Solution s;
+	TreeNode* pRoot = NULL;
+	s.preCreate(pRoot);
+	s.preOrder(pRoot);
+
+	V = s.Print(pRoot);
+	s.show(V);
+}
+int main()
+{
+	Test();
+	getchar();
+	return 0;
+}
