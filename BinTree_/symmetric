@@ -1,0 +1,39 @@
+                A
+             /     \
+            B       B
+          /   \   /   \
+         C     D D     C
+         
+     A 的leftChild左孩子和rightChild右孩子都存在，且val值相等
+     leftChild->left和rightChild->right相等，leftChild->right和rightChild->left相等
+
+/*
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+    TreeNode(int x) :
+            val(x), left(NULL), right(NULL) {
+    }
+};
+*/
+class Solution {
+public:
+    bool isSymmetrical(TreeNode* pRoot)
+    {
+        if(pRoot==NULL)
+            return true;
+        return isS(pRoot->left,pRoot->right);
+    }
+    bool isS(TreeNode *leftChild,TreeNode *rightChild)
+    {
+        if(leftChild == NULL && rightChild == NULL)
+            return true;
+        if(leftChild == NULL||rightChild == NULL || leftChild->val!=rightChild->val)
+            return false;
+        if((isS(leftChild->left, rightChild->right)) && (isS(leftChild->right, rightChild->left)))
+            return true;
+        else 
+            return false;
+    }
+};
