@@ -1,0 +1,161 @@
+//
+
+//
+template<class T>
+struct BinTreeNode
+{
+	BinTreeNode(const T& data)
+	:_Left(NULL)
+	, _Right(NULL)
+	, _data(data)
+	{}
+	BinTreeNode<T>*  _Left;
+	BinTreeNode<T>* _Right;
+	T _data;
+};
+
+template<class T>
+class BinTree
+{
+	typedef BinTreeNode<T> Node;
+	typedef BinTreeNode<T>* pNode;
+
+
+//前序
+	void PreOrder()
+	{
+		_PreOrder(_pRoot);
+		cout << endl;
+	}
+  // 根--->根的左子树---->根的右子树 
+	void _PreOrder(pNode& pRoot)
+	{
+		if (pRoot)
+		{
+			cout << pRoot->_data << " ";
+			_PreOrder(pRoot->_Left);
+			_PreOrder(pRoot->_Right);
+		}
+	}
+	
+	//前序非递归
+	void PreOrder_Nor1()
+	{
+		
+		_PreOrder_Nor1(_pRoot);
+		cout << endl;
+	}
+  void _PreOrder_Nor1(pNode& pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		stack<pNode> s;
+		s.push(pRoot);
+		pNode pCur = pRoot;
+		while (!s.empty())
+		{
+			pCur = s.top ();
+			cout << pCur->_data << " ";
+			s.pop();
+			if (pCur->_Right)
+				s.push(pCur->_Right);
+			if (pCur->_Left)
+				s.push(pCur->_Left);
+		}
+	}
+  
+  //前序非递归2
+	void PreOrder_Nor2()
+	{
+		_PreOrder_Nor2(_pRoot);
+		cout << endl;
+	}
+	
+  void _PreOrder_Nor2(pNode& pRoot)
+	{
+		if (pRoot == NULL)
+			return;
+		stack<pNode> s;
+		s.push(pRoot);
+		pNode pCur = pRoot;
+		while (!s.empty())
+		{
+			pCur = s.top();
+			s.pop();
+			while (pCur)
+			{
+				if (pCur->_Right)
+					s.push(pCur->_Right);
+				cout << pCur->_data << " ";
+				pCur = pCur->_Left;
+			}
+		}
+	}
+  
+  
+  //中序
+  void InOrder()
+	{
+		_InOrder(_pRoot);
+		cout << endl;
+	}
+  // 左子树--->根节点--->右子树 
+	void _InOrder(pNode pRoot)
+	{
+		if (pRoot)
+		{
+			_InOrder(pRoot->_Left);
+			cout << pRoot->_data << " ";
+			_InOrder(pRoot->_Right);
+		}
+	}
+
+//后序
+	void PostOrder()
+	{
+		_PostOrder(_pRoot);
+		cout << endl;
+	}
+  // 左子树--->右子树--->根节点 
+	void _PostOrder(pNode pRoot)
+	{
+		if (pRoot)
+		{
+			_PostOrder(pRoot->_Left);
+			_PostOrder(pRoot->_Right);
+			cout << pRoot->_data << " ";
+		}
+	}
+	
+  //层序
+	void LevelOrder()
+	{
+		_LevelOrder(_pRoot);
+		cout << endl;
+	}
+  	void _LevelOrder(pNode pRoot)
+	{
+		queue<pNode> q;
+		q.push(pRoot);
+		pNode pCur = NULL;
+		while (!q.empty())
+		{
+			pCur = q.front();
+			cout << pCur->_data << " ";
+			q.pop();
+			if (pCur->_Left)
+			{
+				q.push(pCur->_Left);
+			}
+			if (pCur->_Right)
+			{
+				q.push(pCur->_Right);
+			}
+		}
+		cout << endl;
+	}
+	
+private:
+	BinTreeNode<T>* _pRoot;
+};
+
