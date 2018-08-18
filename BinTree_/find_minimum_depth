@@ -1,0 +1,29 @@
+//
+//给定一个二叉树，找出其最小深度。 
+//二叉树的最小深度为根节点到最近叶子节点的距离。
+
+        3
+       /  
+      9
+     / \
+    20  15
+       /
+      7
+      
+class Solution {
+public:
+    int run(TreeNode *root) {
+        return _minimum(root);
+    }
+    int _minimum(TreeNode *root)
+    {
+        if(root==NULL)
+            return 0;
+        if(root->left==NULL)
+            return _minimum(root->right)+1;
+        if(root->right==NULL)
+            return _minimum(root->left)+1;
+        return _minimum(root->left)<_minimum(root->right)?(_minimum(root->left)+1):(_minimum(root->right)+1);
+        
+    }
+};
