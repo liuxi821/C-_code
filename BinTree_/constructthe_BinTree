@@ -1,0 +1,39 @@
+Given inorder and postorder traversal of a tree, constructthe binary tree.
+Note:
+You may assume that duplicates do not exist in the tree.
+
+根据二叉树的后序和中序遍历还原二叉树
+
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode *buildTree(vector<int> &inorder, vector<int> &postorder) {
+        
+        return _buildTree(inorder, 0, inorder.size()-1, postorder, 0, postorder.size()-1);
+    }
+    TreeNode* _buildTree(vector<int> &in, int inleft, int inright, vector<int> &post, int postleft, int postright)
+    {
+        if(inleft>inright||postleft>postright)
+            return NULL;
+        TreeNode* root=new TreeNode(post[postright]);
+        int i=inleft;
+        while(i<=inright)
+        {
+            if(root->val==in[i])
+            {
+                root->left=_buildTree(in, inleft, i-1, post, postleft, postleft-inleft+i-1);
+                root->right=_buildTree(in, i+1, inright, post, postright-inright+i, postright-1);
+            }
+            i++;
+        }
+        return root;
+    }
+};
