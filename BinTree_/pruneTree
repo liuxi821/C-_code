@@ -1,0 +1,58 @@
+给定二叉树根节点root，此外数的每个节点的值要么是0，要么是1
+返回移除了所有不包含1的子树的预原二叉树
+        1                                1
+       /  \                                \
+      0    0      ==============>           0
+          /  \                             /
+         1    0                           1
+______________________________________________________
+         1                                1
+       /   \                            /   \
+      1     1     ==============>      1     1
+    /  \   /  \                      /         \
+   1    0 0    1                    1           1
+ /  
+0
+______________________________________________________
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* pruneTree(TreeNode* root) {
+        if(root==NULL)
+            return root;
+        _pruneTree(root);
+        return root;
+    }
+    void _pruneTree(TreeNode* root) {
+        if(root==NULL)
+            return;
+        
+        if(_ZeroTree(root->left))
+            root->left=NULL;
+        if(_ZeroTree(root->right))
+            root->right=NULL;
+        _pruneTree(root->left);
+        _pruneTree(root->right);
+    }
+    
+    //全为0的子树
+    bool _ZeroTree(TreeNode* root) 
+    {
+        if(root==NULL)
+            return true;
+        if(root->val==1)
+            return false;
+        else
+            return _ZeroTree(root->left)&&_ZeroTree(root->right);
+    }
+};
