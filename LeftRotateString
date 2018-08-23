@@ -1,0 +1,15 @@
+//"12345678"   3  ------>"45678123"
+
+class Solution {
+public:
+	string LeftRotateString(string str, int n) {
+		string s1;
+		string s2;
+		int length = str.size();
+    
+		s1 = str.substr(0, n);//s1截取前n个字符  123
+		s2 = str.substr(n, length);//剩余部分   45678
+		str = s2 + s1;//s2和s1重新拼接
+		return str;
+	}
+};
