@@ -1,0 +1,54 @@
+template<class T>
+class AutoPtr
+{
+public:
+    AutoPtr(T* ptr = NULL)
+        :_ptr(ptr)
+    {
+        cout << "AutoPtr():" << endl;
+    }
+    ~AutoPtr()
+    {
+        cout << "~AutoPtr():" << endl;
+        if (_ptr)
+            delete _ptr;
+        _ptr = NULL;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+private:
+    T* _ptr;
+};
+template<class T>
+class A
+{
+public:
+    A()
+    {}
+public:
+    T _a;
+    T _b;
+    T _c;
+};
+void FunTest1()
+{
+//普通指针
+    int a = 10;
+    int* p1=&a;
+    *p1 = 20;
+    int* p2;
+    p2 = p1;
+
+//智能指针
+    AutoPtr<int> ap1(new int);
+    *ap1 = 10;//解引用
+    cout << *ap1 << endl;
+    AutoPtr<A<int>> ap4(new A<int>);
+    ap4->_a = 30;//成员访问
+}
