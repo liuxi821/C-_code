@@ -1,0 +1,64 @@
+//用一个bool类型的值来判断指针是否为空间真正的拥有者，
+如果是则有对空间的释放权，如果不是，则只可以使用，不能释放 
+
+
+template<class T>
+class AutoPtr
+{
+public:
+    AutoPtr(T* ptr = NULL)
+        :_ptr(ptr)
+        , _owner(true)
+    {
+        cout << "AutoPtr():" << endl;
+        if (_ptr == NULL)
+            _owner = false;
+    }
+    AutoPtr(const AutoPtr& a)
+    {
+        cout << "AutoPtr(const AutoPtr& a):" << endl;
+        if (_ptr)
+            delete _ptr;
+        _ptr = a._ptr;
+        _owner = a._owner;
+        a._owner = false;
+
+    }
+
+    AutoPtr& operator=(const AutoPtr& a)
+    {
+        cout << "AutoPtr& operator=():" << endl;
+        if (&a != this)
+        {
+            if (_ptr)
+                delete _ptr;
+            _ptr = a._ptr;
+            _owner = a._owner;
+            a._owner = false;
+        }
+        return *this;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+    ~AutoPtr()
+    {
+        cout << "~AutoPtr():" << endl;
+        if (_owner&&_ptr)
+        {
+            _owner = false;
+            delete _ptr;
+            _ptr = NULL;
+        }
+    }
+private:
+    T* _ptr;
+    mutable bool _owner;//判断是否为空间的真正拥有者
+};
+
+缺陷：如果真正的拥有者释放了空间，但非拥有者的指针不知道，将变成野指针
