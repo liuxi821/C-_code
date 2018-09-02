@@ -1,4 +1,4 @@
-//原理：资源的转移
+1、//原理：资源的转移
 
 template<class T>
 class AutoPtr
@@ -57,3 +57,64 @@ void FunTest1()
 
 //这样智能指针也可以向普通指针一样可以解引用和调用成员访问符了
 //但它不能像普通指针一样用一个指针去给另一个指针赋值 
+
+2、这个可以给出拷贝构造函数和赋值运算符重载来改进
+template<class T>
+class AutoPtr
+{
+public:
+    AutoPtr(T* ptr = NULL)
+        :_ptr(ptr)
+    {
+        cout << "AutoPtr():" << endl;
+    }
+    AutoPtr(AutoPtr<T>& p)
+    {
+        if (_ptr)
+            delete _ptr;
+        _ptr = p._ptr;
+        p._ptr = NULL;
+    }
+    AutoPtr& operator=(/*const*/ AutoPtr<T>& s)
+    {
+        if (&s != this)
+        {
+            if (_ptr)
+                delete _ptr;
+            _ptr = s._ptr;
+            s._ptr = NULL;
+        }
+
+        return *this;
+    }
+    ~AutoPtr()
+    {
+        cout << "~AutoPtr():" << endl;
+        if (_ptr)
+            delete _ptr;
+        _ptr = NULL;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+private:
+    T* _ptr;
+};
+void FunTest2()
+{
+    AutoPtr<int> ap1(new int);
+    AutoPtr<int> ap2(ap1);//ap1交出自己对资源的管理权限
+    AutoPtr<int> ap3(new int);
+    ap3 = ap2;
+    *ap3 = 30;
+}
+
+//存在缺陷：
+尽管如此解决了初始化和赋值的问题，但如果：p2=p1,p1这块空间就不能使用了，
+还是有严重缺陷的，由于C++一旦产生的语法就不能取消，因为他还在我们的库里面，
+所以不建议使用autoptr 
