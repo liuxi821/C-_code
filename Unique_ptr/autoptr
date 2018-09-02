@@ -1,3 +1,5 @@
+//原理：资源的转移
+
 template<class T>
 class AutoPtr
 {
@@ -52,3 +54,6 @@ void FunTest1()
     AutoPtr<A<int>> ap4(new A<int>);
     ap4->_a = 30;//成员访问
 }
+
+//这样智能指针也可以向普通指针一样可以解引用和调用成员访问符了
+//但它不能像普通指针一样用一个指针去给另一个指针赋值 
