@@ -1,0 +1,70 @@
+//防拷贝
+由于前两种都是在赋值和拷贝时出错，因此可以禁止它赋值拷贝
+//1、只管理单个对象的ScopedPtr
+template<class T>
+class ScopedPtr
+{
+public:
+    ScopedPtr(T* ptr = NULL)
+        :_ptr(ptr)
+    {}
+    ~ScopedPtr()
+    {
+        if (_ptr)
+            delete _ptr;
+        _ptr = NULL;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+    //私有----------友元函数可以调用
+    //只声明，不定义------可以在类外定义
+private://赋值运算符重载和拷贝构造  只声明，不定义
+    ScopedPtr(const ScopedPtr& s);
+    ScopedPtr& operator=(const ScopedPtr& s);
+private:
+    T* _ptr;
+};
+
+
+//2、管理多个对象的ScopedPtr
+template<class T>
+class ScopedArray
+{
+public:
+    ScopedArray(T* ptr = NULL)
+        :_ptr(ptr)
+    {}
+    ~ScopedArray()
+    {
+        if (_ptr)
+            delete _ptr;
+        _ptr = NULL;
+    }
+    T& operator[](size_t index)
+    {
+        return _ptr[index];
+    }
+    const T& operator[](size_t index)const
+    {
+        return _ptr[index];
+    }
+    /*T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }*/
+private://赋值运算符重载和拷贝构造  只声明，不定义
+    ScopedArray(const ScopedArray<T>& s);
+    ScopedArray& operator=(const ScopedArray<T>& s);
+private:
+    T* _ptr;
+};
