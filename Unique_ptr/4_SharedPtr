@@ -1,0 +1,345 @@
+SharedPtr: 
+原理：应用引用计数 
+——shared_ptr是一个最像智能指针的“智能指针”，是源自boost库，后被收录到C++11标准的TR1库中。 
+——shared_ptr是用于管理new动态分配对象的智能指针，它重载了*和->操作符以模仿原始指针的行为，
+提供隐式bool类型转换以判断指针的有效性，get()函数可以得到指针原始指针，并且没有提供指针算术操作。 
+new两个空间，其中一个用来存几个指针来指向该空间，当计数为1时，才可以释放
+
+
+template<class T>
+class SharedPtr
+{
+public:
+    SharedPtr(T* ptr = NULL)
+        :_ptr(ptr)
+        , _count(new int(0))
+    {
+        cout << "SharedPtr()" << endl;
+        if (_ptr)
+            *_count = 1;
+    }
+    SharedPtr(const SharedPtr<T>& sh)
+        :_ptr(sh._ptr)
+        , _count(sh._count)
+    {
+        cout << "SharedPtr(&)" << endl;
+        (*_count)++;
+    }
+    SharedPtr& operator=(const SharedPtr<T>& sh)
+    {
+        cout << "SharedPtr(=)" << endl;
+        if (&sh != this)
+        {
+            /*if (_ptr && 0 == --*_count)
+            {
+                delete _ptr;
+                delete _count;
+            }   */
+            Release();
+            _ptr = sh._ptr;
+            _count = sh._count;
+            if (_count)
+                (*_count)++;
+        }
+        return *this;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+    int UseCount()
+    {
+        if (_count)
+            return *_count;
+        else
+            return 0;
+    }
+
+    ~SharedPtr()
+    {
+        cout << "~SharedPtr()" << endl;
+        Release();
+    }
+private:
+    void Release()
+    {
+        if (_ptr && 0 == --(*_count))
+        {
+            delete _ptr;
+            delete _count;
+        }
+    }
+private:
+    T* _ptr;
+    T* _count;
+};
+
+这样就没问题了吗？————————它显然是不可以处理文件指针 
+
+
+在次对代码进行改进： 
+它不能处理文件指针，因为文件指针是不能用delete 来释放的，所以我们需要将它单独的列出来。这里有两种方法： 
+
+//****************************************定制删除器******************************************
+1、定制删除器
+
+template<class T>
+void Delete(T*& p)
+{
+    if (p)
+        delete p;
+    p = NULL;
+}
+
+template<class T>
+void Free(T*& p)
+{
+    if (p)
+        free(p);
+    p = NULL;
+}
+
+void FClose(FILE*& p)
+{
+    if (p)
+        fclose(p);
+    p = NULL;
+}
+
+template<class T>
+class SharedPtr
+{
+public:
+//第二个参数为函数指针
+    SharedPtr(T* ptr = NULL,void (*pFun)(T*&)=Delete)
+        :_ptr(ptr)
+        , _count(new int(0))
+        , _Dptr(pFun)
+    {
+        cout << "SharedPtr()" << endl;
+        if (_ptr)
+            *_count = 1;
+    }
+    SharedPtr(const SharedPtr<T>& sh)
+        :_ptr(sh._ptr)
+        , _count(sh._count)
+    {
+        cout << "SharedPtr&()" << endl;
+        (*_count)++;
+    }
+    SharedPtr& operator=(const SharedPtr<T>& sh)
+    {
+        cout << "SharedPtr=()" << endl;
+        if (&sh != this)
+        {
+            /*if (_ptr && 0 == --*_count)
+            {
+                delete _ptr;
+                delete _count;
+            }   */
+            Release();
+            _ptr = sh._ptr;
+            _count = sh._count;
+            if (_count)
+                (*_count)++;
+        }
+        return *this;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+    int UseCount()
+    {
+        if (_count)
+            return *_count;
+        else
+            return 0;
+    }
+
+    ~SharedPtr()
+    {
+        cout << "~SharedPtr()" << endl;
+        Release();
+    }
+private:
+    void Release()
+    {
+        if (_ptr && 0 == --(*_count))
+        {
+            _Dptr(_ptr);
+            delete _count;
+        }
+    }
+private:
+    T* _ptr;
+    int* _count;
+    void(*_Dptr)(T*&);//函数指针
+};
+
+
+//****************************************利用仿函数解决******************************************
+2、利用仿函数解决
+
+//仿函数
+
+template<class T>
+struct Delete
+{
+    void operator()(T*& p)
+    {
+        if (p)
+        {
+            delete p;
+            p = NULL;
+        }
+    }
+};
+template<class T>
+struct Free
+{
+    void operator()(T*& p)//函数调用运算符的重载
+    {
+        if (p)
+        {
+            free(p);
+            p = NULL;
+        }
+    }
+};
+struct Fclose
+{
+    void operator()(FILE*& p)
+    {
+        if (p)
+        {
+            fclose(p);
+            p = NULL;
+        }
+    }
+};
+
+
+template<class T,class _Dx>
+class SharedPtr
+{
+public:
+    SharedPtr(T* ptr = NULL)
+        :_ptr(ptr)
+        , _count(new int(0))
+    {
+        cout << "SharedPtr()" << endl;
+        if (_ptr)
+            *_count = 1;
+    }
+    SharedPtr(const SharedPtr<T,_Dx>& sh)
+        :_ptr(sh._ptr)
+        , _count(sh._count)
+    {
+        cout << "SharedPtr&()" << endl;
+        (*_count)++;
+    }
+    SharedPtr& operator=(const SharedPtr<T, _Dx>& sh)
+    {
+        cout << "SharedPtr=()" << endl;
+        if (&sh != this)
+        {
+            Release();
+            _ptr = sh._ptr;
+            _count = sh._count;
+            if (_count)
+                (*_count)++;
+        }
+        return *this;
+    }
+    T& operator*()
+    {
+        return *_ptr;
+    }
+    T* operator->()
+    {
+        return _ptr;
+    }
+    int UseCount()
+    {
+        if (_count)
+            return *_count;
+        else
+            return 0;
+    }
+
+    ~SharedPtr()
+    {
+        cout << "~SharedPtr()" << endl;
+        Release();
+    }
+private:
+    void Release()
+    {
+        if (_ptr && 0 == --(*_count))
+        {
+            _Dx dx;
+            dx(_ptr);//dx.operator()(_ptr)
+
+            //delete _ptr;
+            delete _count;
+        }
+    }
+private:
+    T* _ptr;
+    int* _count;
+
+};
+
+//****************************************************************************
+继续看代码还存在什么问题： 
+如果是这样子呢：
+
+#include<memory>
+template<class T>
+struct Node
+{
+    Node(const T& data)
+    :_pNext(NULL)
+    , _pPre(NULL)
+    , _data(data)
+    {
+        cout << "Node():" << this << endl;
+    }
+    ~Node()
+    {
+        cout << "~Node():" << this << endl;
+    }
+    shared_ptr<Node<T>> _pNext;
+    shared_ptr<Node<T>> _pPre;
+
+    T _data;
+};
+void Test()
+{
+    shared_ptr<Node<int>> sp1(new Node<int>(10));
+    shared_ptr<Node<int>> sp2(new Node<int>(20));
+    cout << sp1.use_count() << endl;
+    cout << sp2.use_count() << endl;
+    sp1->_pNext = sp2;
+    sp2->_pPre = sp1;
+    cout << sp1.use_count() << endl;
+    cout << sp2.use_count() << endl;
+}
+int main()
+{
+    Test();
+
+    getchar();
+    return 0;
+}
+
+//存在循环引用问题，那么如何解决呢？
